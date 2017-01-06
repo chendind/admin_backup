@@ -1,0 +1,158 @@
+<div class="admin_content_innerBox" id="admin_content_innerBox">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-table fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">联系创道</span>
+		</div>	
+		<div class="admin_ui_cont">
+				
+			<div class="admin_ui_search">
+				<div class="inner">
+					<input class="admin_ui_input" type="text">
+					<i @click="search" class="fa fa-search"></i>
+				</div>
+			</div>
+			<table class="admin_ui_table">
+			
+				<tbody class="admin_ui_table_hoverEffect">
+					<tr>
+						<th>热线</th>
+						<td>{{dataSource_hotline}}</td>
+					</tr>
+					<tr>
+						<th>邮箱</th>
+						<td>{{dataSource_email}}</td>
+					</tr>
+					<tr>
+						<th>传真</th>
+						<td>{{dataSource_fax}}</td>
+					</tr>
+					<tr>
+						<th>新浪微博地址</th>
+						<td>{{dataSource_weibo}}</td>
+					</tr>
+					<tr>
+						<th>新浪微博二维码</th>
+						<td style="text-align: center;"><img :src="baseUrl+dataSource_weiboimg" width="80%" height="200px"></td>
+					</tr>
+					<tr>
+						<th>微信公众号名称</th>
+						<td>{{dataSource_weixin}}</td>
+					</tr>
+					<tr>
+						<th>微信公众号二维码</th>
+						<td style="text-align: center;"><img :src="baseUrl+dataSource_weixinimg" width="80%" height="200px"></td>
+					</tr>
+					
+					<tr>
+						<th>操作</td>
+						<td class="admin_ui_table_action">
+							<a :href="getUrl()" class="iconButton checkIcon">
+								<i class="fa fa-eye"></i>
+								修改
+							</a>						
+						</td>
+					</tr>
+				
+				
+				</tbody>
+			</table>
+			<div class="admin_ui_pagination">
+				<div class="M-box"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var vm = new Tvm({
+	el: '#admin_content_innerBox',
+	data:{
+		keyword: "",
+		usersDataSource: [],
+		usersDataSource_filter:[],
+		baseUrl: "http://chuangdao.moovi-tech.com",
+		dataSource_hotline:"",
+		dataSource_email:"",
+		dataSource_fax:"",
+		dataSource_weibo:"",
+		dataSource_weiboimg:"",
+		dataSource_weixin:"",
+		dataSource_weixinimg:"",		
+		pageIndex: 1
+	},
+	methods: {
+		getUrl:function(){
+			return '#/contact_contactus_detail.html';
+		},
+		search: function(){
+			var self = this;
+			self.usersDataSource_filter = [];
+			for(index in self.usersDataSource){
+				var _user = self.usersDataSource[index];
+				if(self.isContainKeyword([_user.id, stamp2time(_user.in_time), _user.userinfo.nick, _user.userinfo.nick.phone],self.keyword)){
+					self.usersDataSource_filter.push(_user);
+				}
+			}
+			self.refreshTable();
+		},
+		isContainKeyword: function(arr,keyword){
+			for(index in arr){
+				if(typeof arr[index] == "undefined"){
+					arr[index]="";
+				}
+				if(typeof arr[index] != "string"){
+					arr[index] = arr[index]+"";
+				}
+				if(arr[index].search(keyword)>=0){
+					return true;
+				}
+			}
+			return false;
+		},
+		refreshTable: function(){
+			var self = this;
+			$('.M-box').pagination({
+				totalData: self.usersDataSource_filter.length,
+			    showData: 10,
+			    current: self.pageIndex,
+			    count: 3,
+			    jump: true,
+				coping: true,
+				prevContent:'<i class="fa fa-angle-left"></i>',		//上一页内容
+				nextContent:'<i class="fa fa-angle-right"></i>',		//下一页内容
+			    callback:function(index){
+			        self.pageIndex = index;
+			    }
+			});
+		},
+	},
+	created: function(){
+		var self = this;
+		$.when(getContactus()).done(function(data){
+			self.usersDataSource = data.list;
+			self.usersDataSource_filter = self.usersDataSource;
+			for (var i = 0; i < self.usersDataSource.length; i++) {
+				if(self.usersDataSource[i].name=="hotline"){
+					self.dataSource_hotline = self.usersDataSource[i].value;
+				}
+				if(self.usersDataSource[i].name=="email"){
+					self.dataSource_email = self.usersDataSource[i].value;
+				}
+				if(self.usersDataSource[i].name=="fax"){
+					self.dataSource_fax = self.usersDataSource[i].value;
+				}
+				if(self.usersDataSource[i].name=="weibo"){
+					self.dataSource_weibo = self.usersDataSource[i].value;
+					self.dataSource_weiboimg = self.usersDataSource[i].img[0];
+				}
+				if(self.usersDataSource[i].name=="weixin"){
+					self.dataSource_weixin = self.usersDataSource[i].value;
+					self.dataSource_weixinimg = self.usersDataSource[i].img[0];
+				}
+			}
+			self.refreshTable();
+		});
+	}
+});
+
+</script>

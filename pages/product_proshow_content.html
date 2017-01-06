@@ -1,0 +1,138 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">项目展示详情编辑</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<textarea id="tinymce"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+<script>
+var editor =  new tinymce.Editor('tinymce', {
+	statusbar: false,
+    height: 500,
+	theme: 'modern',
+	language: 'zh_CN',
+	plugins: [
+	    'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+	    'searchreplace wordcount visualblocks visualchars code fullscreen',
+	    'insertdatetime media nonbreaking save table contextmenu directionality',
+	    'emoticons template paste textcolor colorpicker textpattern imagetools'
+	],
+	toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+	toolbar2: 'print preview media | forecolor backcolor emoticons | fontselect',
+	font_formats: '华文细黑="STHeiti Light";华文黑体=STHeiti;华文楷体=STKaiti; 华文宋体=STSong; 华文仿宋=STFangsong ;黑体=SimHei;宋体=SimSun ;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n',
+	setup: function(ed) {
+      	ed.addButton('example', {
+         	title: 'My title',
+         	image: 'https://avatars0.githubusercontent.com/u/9668199?v=3&s=40',
+         	onclick: function() {
+            	ed.insertContent('Hello world!!');
+         	}
+      	});
+      	ed.addMenuItem('example2', {
+	        text: 'My menu item',
+	        context: 'tools',// 定义菜单被加入的位置： file\edit\insert\view\format\table\tools
+	        onclick: function() {
+	            ed.insertContent('Hello world!!');
+	        }
+        });
+    },
+	image_advtab: true,
+	image_upload: true,
+	image_upload_url: '/upload',
+	relative_url: false,
+	templates: [
+	    { title: 'Test template 1', content: 'Test 1' },
+	    { title: 'Test template 2', content: 'Test 2' }
+	],
+	content_css: [
+	    '//www.tinymce.com/css/codepen.min.css'
+	]
+}, tinymce.EditorManager);
+
+editor.render();
+// 获得编辑器中内容
+function getEditorContent(){
+	return editor.getContent();
+}
+// 设置编辑器内容
+function setEditorContent(html){
+	editor.setContent(html);
+}
+// 往编辑器中插入内容
+function insertContentToEditor(html){
+	editor.insertContent(html);
+}
+// 设置 "design", "code" or "readonly"
+function setEditorMode(mode){
+	editor.setMode(mode);
+}
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL;
+}
+
+
+var id_array=window.location.hash;
+var id_get=id_array.split("=")[1];
+
+var  img_count = 0;
+var id_this, name_this, value_this, description_this, img_this;
+$.when(getProshow()).done(function(data){
+	var info = data.list;
+	for (var i = 0; i < info.length; i++) {
+		if(info[i].id == id_get){
+			var info_this = info[i]
+		}
+	}
+	console.log(info_this)
+	var html = "<p>hehe</p>";
+	id_this = info_this.id;
+	name_this = info_this.name;
+	description_this = "PROJECT_GALLERY";
+	img_this = info_this.img;	
+
+	setTimeout(function(){
+		setEditorContent(html);
+	},1000);
+	$(".admin_ui_button_green").on("click",function(){
+		console.log(getEditorContent());
+		value_this = getEditorContent();
+		$.when(editIntroduction(id_this, name_this, value_this, description_this, img_this)).done(function(data){
+			if(data.state){
+				alert(data.detail);
+			}
+			else{
+				alert("修改成功");
+			}
+		});
+
+		//修改数据库内容
+	});
+});
+
+
+
+
+
+
+</script>

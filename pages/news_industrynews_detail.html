@@ -1,0 +1,187 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">行业新闻详情编辑</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">题目</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入题目">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">摘要</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入摘要">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">时间</div>
+					<input class="time_input" style="border: 1px solid #ddd;padding: 6px 4px;
+    height: 30px;" type="text" placeholder="请输入年">
+					<input class="time_input" style="border: 1px solid #ddd;padding: 6px 4px;
+    height: 30px;" type="text" placeholder="请输入月">
+					<input class="time_input" style="border: 1px solid #ddd;padding: 6px 4px;
+    height: 30px;" type="text" placeholder="请输入日">
+				</div>
+
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">配图</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入图片地址">
+				</div>
+			</div>
+			<div class="admin_ui_border admin_ui_cont">
+				正文
+				<div class="admin_ui_form_field">
+					<textarea id="tinymce"></textarea>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<a href="#/news_industrynews.html" class="admin_ui_button admin_ui_button_white" data-urlBack>返回</a>
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+<script>
+var editor =  new tinymce.Editor('tinymce', {
+	statusbar: false,
+    height: 500,
+	theme: 'modern',
+	language: 'zh_CN',
+	content_style: "body{font-family: sans-serif}",
+	plugins: [
+	    'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+	    'searchreplace wordcount visualblocks visualchars code fullscreen',
+	    'insertdatetime media nonbreaking save table contextmenu directionality',
+	    'emoticons template paste textcolor colorpicker textpattern imagetools'
+	],
+	toolbar1: 'insertfile undo redo | fontselect | fontsizeselect | styleselect | bold italic underline strikethrough superscript subscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+	toolbar2: 'link image media | forecolor backcolor emoticons print preview', //| example
+	font_formats: '宋体=SimSun,STSong;黑体=SimHei,STHeiti;微软雅黑=Microsoft YaHei;楷体=KaiTi,STKaiti;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n',
+	fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 60pt 72pt',
+	init_instance_callback: function (editor) {
+		editor.on('keydown', function (e) {
+			// tab键缩紧2格
+	    	if(e.keyCode == 9){
+	    		e.preventDefault();
+	    		this.execCommand("mceInsertContent", false, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+	    	}
+	    });
+	    editor.on('keyup', function (e) {
+	    	if(e.keyCode == 9){
+	    		 
+	    	}
+	    });
+	},
+
+	setup: function(ed) {
+      	ed.addButton('example', {
+         	title: 'My title',
+         	image: 'https://avatars0.githubusercontent.com/u/9668199?v=3&s=40',
+         	onclick: function() {
+            	ed.insertContent('Hello world!!');
+         	}
+      	});
+      	ed.addMenuItem('example2', {
+	        text: 'My menu item',
+	        context: 'tools',// 定义菜单被加入的位置： file\edit\insert\view\format\table\tools
+	        onclick: function() {
+	            ed.insertContent('Hello world!!');
+	        }
+        });
+    },
+	image_advtab: true,
+	image_upload: true,
+	image_upload_url: '/upload',
+	relative_url: false,
+	templates: [
+	    { title: 'Test template 1', content: 'Test 1' },
+	    { title: 'Test template 2', content: 'Test 2' }
+	],
+}, tinymce.EditorManager);
+
+editor.render();
+// 获得编辑器中内容
+function getEditorContent(){
+	return editor.getContent();
+}
+// 设置编辑器内容
+function setEditorContent(html){
+	editor.setContent(html);
+}
+// 往编辑器中插入内容
+function insertContentToEditor(html){
+	editor.insertContent(html);
+}
+// 设置 "design", "code" or "readonly"
+function setEditorMode(mode){
+	editor.setMode(mode);
+}
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL;
+}
+
+var title,summary,year,month,day,img,text;
+var id_array=window.location.hash;
+var id_get=id_array.split("=")[1];
+var add = 1;
+
+if(!(typeof(id_get) == "undefined")){
+	add = 0;
+	$.when(getPro_content(id_get)).done(function(data){
+			$(".admin_ui_input")[0].value = data.title;
+			$(".admin_ui_input")[1].value = data.summary;
+			$(".admin_ui_input")[2].value = data.img[0];
+			$(".time_input")[0].value = stamp2time(data.time).split("-")[0];
+			$(".time_input")[1].value = stamp2time(data.time).split("-")[1];
+			$(".time_input")[2].value = stamp2time(data.time).split("-")[2];
+			text = data.text;
+			setTimeout(function(){
+				setEditorContent(text);
+				},1000);	
+		
+	});
+}
+
+
+$(".admin_ui_button_green").on("click",function(){
+	title = $(".admin_ui_input")[0].value;
+	summary = $(".admin_ui_input")[1].value;
+	img = $(".admin_ui_input")[2].value;
+
+	year = $(".time_input")[0].value;
+	month = $(".time_input")[1].value;
+	day = $(".time_input")[2].value;
+	text = getEditorContent();
+	var mydate = new Date();
+	mydate.setFullYear(year,month-1,day);
+	if(add){
+		$.when(addArticle(mydate,title,summary,text,img,"INDUSTRY_NEWS","")).done(function(data){
+			alert("添加成功");
+  			window.location.href="#/news_industrynews.html"; 
+		});
+	}
+	else{
+		$.when(editArticle(id_get,mydate,title,summary,text,img,"INDUSTRY_NEWS","")).done(function(data){
+			alert("修改成功");
+  			window.location.href="#/news_industrynews.html"; 
+		});
+	}
+});
+
+
+
+
+</script>

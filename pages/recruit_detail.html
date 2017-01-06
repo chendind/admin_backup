@@ -1,0 +1,191 @@
+<style type="text/css">
+.addInput:hover{
+	cursor:pointer;
+}
+</style>
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">招聘中心信息修改</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">职位名</div>
+					<input type="text" class="admin_ui_input tmp" placeholder="请输入职位名">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">职责<div class="addInput" id="addInput_duty" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-plus-square-o"></i></div></div>
+					<input type="text" class="admin_ui_input tmp" placeholder="请输入职责">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">要求<div class="addInput" id="addInput_requirement" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-plus-square-o"></i></div></div>
+					<input type="text" class="admin_ui_input tmp" placeholder="请输入要求">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">地点<div class="addInput" id="addInput_place" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-plus-square-o"></i></div></div>
+					<input type="text" class="admin_ui_input tmp" placeholder="请输入地点">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">邮箱</div>
+					<input type="text" class="admin_ui_input tmp" placeholder="请输入邮箱">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<a href="#/recruit.html" class="admin_ui_button admin_ui_button_white" data-urlBack>返回</a>
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+<script>
+var editor =  new tinymce.Editor('tinymce', {
+    height: 500,
+	theme: 'modern',
+	language: 'zh_CN',
+	plugins: [
+	    'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+	    'searchreplace wordcount visualblocks visualchars code fullscreen',
+	    'insertdatetime media nonbreaking save table contextmenu directionality',
+	    'emoticons template paste textcolor colorpicker textpattern imagetools'
+	],
+	toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+	toolbar2: 'print preview media | forecolor backcolor emoticons | example',
+	setup: function(ed) {
+      	ed.addButton('example', {
+         	title: 'My title',
+         	image: 'https://avatars0.githubusercontent.com/u/9668199?v=3&s=40',
+         	onclick: function() {
+            	ed.insertContent('Hello world!!');
+         	}
+      	});
+      	ed.addMenuItem('example2', {
+	        text: 'My menu item',
+	        context: 'tools',// 定义菜单被加入的位置： file\edit\insert\view\format\table\tools
+	        onclick: function() {
+	            ed.insertContent('Hello world!!');
+	        }
+        });
+    },
+	image_advtab: true,
+	image_upload: true,
+	image_upload_url: '/upload',
+	relative_url: false,
+	templates: [
+	    { title: 'Test template 1', content: 'Test 1' },
+	    { title: 'Test template 2', content: 'Test 2' }
+	],
+	content_css: [
+	    '//www.tinymce.com/css/codepen.min.css'
+	]
+}, tinymce.EditorManager);
+
+editor.render();
+// 获得编辑器中内容
+function getEditorContent(){
+	return editor.getContent();
+}
+// 设置编辑器内容
+function setEditorContent(html){
+	editor.setContent(html);
+}
+// 往编辑器中插入内容
+function insertContentToEditor(html){
+	editor.insertContent(html);
+}
+// 设置 "design", "code" or "readonly"
+function setEditorMode(mode){
+	editor.setMode(mode);
+}
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL;
+}
+
+var position,email;
+var duty=[];
+var requirement=[];
+var place=[];
+var id_array=window.location.hash;
+var id_get=id_array.split("=")[1];
+var add = 1;
+if(!(typeof(id_get) == "undefined")){
+	add = 0;
+	$.when(getRecruitment()).done(function(data){
+		var datalist = data.list;	
+		for (var i = 0; i < datalist.length; i++) {
+			if(datalist[i].id==id_get){
+				$(".tmp")[0].value = datalist[i].position;
+				$(".tmp")[1].value = datalist[i].duty;
+				$(".tmp")[2].value = datalist[i].requirement;
+				$(".tmp")[3].value = datalist[i].place;
+				$(".tmp")[4].value = datalist[i].email;
+			}
+		}
+	});
+}
+
+var duty_count = 0;
+var requirement_count = 0;
+var place_count = 0;
+$("#addInput_duty").on("click",function(){
+	duty_count++;
+	var input = document.createElement('input');
+	input.setAttribute('type','text');
+	input.setAttribute('class','admin_ui_input input_duty');
+	$("#addInput_duty").parent().parent().append(input);
+})
+$("#addInput_requirement").on("click",function(){
+	requirement_count++;
+	var input = document.createElement('input');
+	input.setAttribute('type','text');
+	input.setAttribute('class','admin_ui_input input_requirement');	
+	$("#addInput_requirement").parent().parent().append(input);
+})
+$("#addInput_place").on("click",function(){
+	place_count++;
+	var input = document.createElement('input');
+	input.setAttribute('type','text');
+	input.setAttribute('class','admin_ui_input input_place');
+	$("#addInput_place").parent().parent().append(input);
+})
+
+$(".admin_ui_button_green").on("click",function(){
+	position = $(".tmp")[0].value;
+	duty[0] = $(".tmp")[1].value;
+	requirement[0] = $(".tmp")[2].value;
+	place[0] = $(".tmp")[3].value;
+	email = $(".tmp")[4].value;
+	for (var i = 1; i < duty_count + 1; i++) {
+	 	duty[i] =  $(".input_duty")[i-1].value;
+	}
+	for (var i = 1; i < requirement_count + 1; i++) {
+	 	requirement[i] =  $(".input_requirement")[i-1].value;
+	}
+	for (var i = 1; i < place_count + 1; i++) {
+	 	place[i] =  $(".input_place")[i-1].value;
+	}	
+	if(add){
+		$.when(addRecruitment(position,duty,requirement,place,email)).done(function(data){
+			alert("添加成功");
+  			window.location.href="#/recruit.html"; 
+		});
+	}
+	else{
+		$.when(editCrucitement(id_get,position,duty,requirement,place,email)).done(function(data){
+			alert("修改成功");
+  			window.location.href="#/recruit.html"; 
+		});
+	}
+})
+</script>
